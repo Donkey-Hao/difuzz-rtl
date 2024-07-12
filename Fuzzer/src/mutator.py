@@ -10,6 +10,7 @@ MUTATION   = 1
 MERGE      = 2
 
 """ Template versions """
+# 机器模式(Machine, M模式)、用户模式(User, U模式)、管理模式(Supervisor, S模式)、监视模式(Hypervisor, H模式).
 P_M = 0
 P_S = 1
 P_U = 2

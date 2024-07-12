@@ -9,7 +9,7 @@ from cocotb.decorators import coroutine
 from cocotb.triggers import Timer, RisingEdge
 from cocotb.result import TestError, TestFailure
 
-@coroutine
+@coroutine  # 这个关键词是装饰器，用于定义一个协程
 def clock_gen(clock, period=2):
     while True:
         clock <= 1
@@ -19,18 +19,18 @@ def clock_gen(clock, period=2):
 
 @coroutine
 def run_test(dut):
-    cov = os.environ['COV']
+    cov = os.environ['COV']     # COV 是 coverage 的缩写
     assert cov in ['rand', 'mux', 'reg'], \
         'COV must be one of rand, mux, cov'
 
-    chances = int(os.environ['CHANCES'])
-    try: max_cycles = int(os.environ['MAX'])
+    chances = int(os.environ['CHANCES'])        # CHANCES 是机会数，可以理解为批次
+    try: max_cycles = int(os.environ['MAX'])    # MAX 是最大周期数
     except: max_cycles = sys.maxint
 
-    mutator = bitMutator()
-    monitor = covMonitor(cov)
-    cocotb.fork(clock_gen(dut.clock))
-    clkedge = RisingEdge(dut.clock)
+    mutator = bitMutator()      # 变异器
+    monitor = covMonitor(cov)   # 覆盖率监视器
+    cocotb.fork(clock_gen(dut.clock))       # 生成时钟
+    clkedge = RisingEdge(dut.clock)         # 时钟上升沿
 
     # num_iter = 1000
 
@@ -42,7 +42,7 @@ def run_test(dut):
     start_time = time.time()
     for chance in range(chances):
         hit_bug = False
-
+        # 每一批都要初始化变异器和监视器，这里变异器是随机的
         mutator.init()
         monitor.init()
 
@@ -124,7 +124,7 @@ def run_test(dut):
 
 class bitMutator():
     def __init__(self):
-        self.corpus = []
+        self.corpus = []    # 种子集合为空，即没有种子
         self.corpus_size = 100
         self.new_seed = None
 
@@ -132,26 +132,31 @@ class bitMutator():
         self.corpus = []
 
     def get_input(self):
+        # 50% 的概率使用随机种子，或者 corpus 为空时
         if not self.corpus or random.random() < 0.5:
+            # 生成 30 位随机种子
             seed = [ random.randint(0,1) for i in range(3 * 10)]
         else:
+            # 从 corpus 中随机选择一个种子
             seed = random.choice(self.corpus)
-
+        # 变异种子
         self.new_seed = self.mutate(seed)
         return self.new_seed
 
     def mutate(self, seed):
         new_seed = []
         for i in range(len(seed)):
+            # seed 的每一位有 20% 的概率变异
             if random.random() < 0.2:
                 new_seed.append(1^seed[i])
             else:
                 new_seed.append(seed[i])
-
+        # 当 seed 的长度不足 30 时，有 10% 的概率增加 3 位
         if random.random() < 0.1 and len(new_seed) < 30:
             new_seed = new_seed + [ random.randint(0,1) for i in range(3)]
+        # 当 seed 的长度超过 3 时，有 10% 的概率减少 3 位
         if random.random() < 0.1 and len(new_seed) > 3:
-            new_seed = new_seed[0:len(new_seed) - 3]
+            new_seed = new_seed[0:len(new_seed) - 3]    # 从 0 开始，到 len(new_seed) - 3 结束
 
         return new_seed
 
@@ -170,13 +175,16 @@ class covMonitor():
         self.mux_covs = []
 
     def interesting(self, coverage):
+        # 只有在 cov 为 mux 和 reg 时，coverage 增加会被认为是有趣的
+        # 这里的参数 coverage 是提高覆盖率的那个值（输入）
         if self.cov == 'mux':
             covsum = 0
-
+            # 如果 coverage 不在 mux_covs 中，说明是新的覆盖
             if coverage not in self.mux_covs:
                 self.mux_covs.append(coverage)
+                # tot_covs 是所有覆盖的并集
                 self.tot_covs = self.tot_covs | coverage
-
+                # 计算 tot_covs 的二进制表示中 1 的个数
                 for i in range(18):
                     covsum = covsum + (self.tot_covs >> i & 1)
 

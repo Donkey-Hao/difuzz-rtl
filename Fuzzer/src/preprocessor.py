@@ -26,6 +26,7 @@ class rvPreProcessor():
     def get_symbols(self, elf_name, sym_name):
         # symbol_file = self.base + '/.input.symbols'
         fd = open(sym_name, 'w')
+        # nm 命令显示关于指定 File 中符号的信息
         subprocess.call([ 'nm', elf_name], stdout=fd )
         fd.close()
 
@@ -33,7 +34,14 @@ class rvPreProcessor():
         fd = open(sym_name, 'r')
         lines = fd.readlines()
         fd.close()
-
+        ''' nm 命令显示关于指定 File 中符号的信息
+        $nm myProgrammer
+        08049f28 d _DYNAMIC
+        08049ff4 d _GLOBAL_OFFSET_TABLE_
+        080484dc R _IO_stdin_used
+        08049f18 d __CTOR_END__
+        '''
+        # 读取每一行，将符号和地址存入字典
         for line in lines:
             symbol = line.split(' ')[2]
             addr = line.split(' ')[0]
