@@ -44,8 +44,11 @@ class rvRTLhost():
             print(message)
 
     def set_bootrom(self):
+        # 内存地址，从 0x10000 开始
         bootrom_addrs = []
+        # 内存中的数据
         memory = {}
+        # 这段汇编代码的作用是初始化几个寄存器，并最终跳转到地址 0x80000000
         bootrom = [ 0x00000297, # auipc t0, 0x0
                     0x02028593, # addi a1, t0, 32
                     0xf1402573, # csrr a0, mhartid
@@ -65,9 +68,24 @@ class rvRTLhost():
 
         for i in range(0, len(bootrom), 2):
             bootrom_addrs.append(0x10000 + i * 4)
+            # 将 bootrom 中的两个元素合并为一个 64 位数据，并存储在内存字典中对应的地址位置
             memory[0x10000 + i * 4] = (bootrom[i+1] << 32) | bootrom[i]
+            # bootrom[i+1] 被移位 32 位，组成高位，bootrom[i] 组成低位
 
         return (bootrom_addrs, memory)
+        '''
+        memory = {
+            0x10000: 0x0202859300000297,
+            0x10008: 0x0182b283f1402573,
+            0x10010: 0x0000000000028067,
+            0x10018: 0x0000000080000000,
+            0x10020: 0x0000000000000000,
+            0x10028: 0x0000000000000000,
+            0x10030: 0x0000000000000000,
+            0x10038: 0x0000000000000000
+        }
+
+        '''
 
     @coroutine
     def clock_gen(self, clock, period=2):

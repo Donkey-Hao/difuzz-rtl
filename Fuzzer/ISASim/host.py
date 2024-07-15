@@ -28,4 +28,5 @@ class rvISAhost():
             [ '+signature={}'.format(self.isa_sigfile), binary ]
 
         self.debug_print('[ISAHost] Start ISA simulation')
+        # 配置好参数后，调用subprocess.call()执行命令
         return subprocess.call(args)

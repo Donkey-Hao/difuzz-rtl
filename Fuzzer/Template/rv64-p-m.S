@@ -238,6 +238,7 @@ PT_BASES
     .section .data.random0;
     .align  8;
 
+/* 每次初始化寄存器都是随机的值  */
 _random_data0:
         /* Random data */
 _end_data0:

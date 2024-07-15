@@ -109,7 +109,7 @@ class rvMutator():
         self.max_data = max_data_seeds
         self.random_data = {}
         self.data_seeds = []
-
+        # 指令生成器，自己写的，这里可以使用
         self.inst_generator = rvInstGenerator('RV64G')
 
     def add_data(self, new_data=[]):
@@ -127,10 +127,13 @@ class rvMutator():
         return seed
 
     def update_data_seeds(self, seed):
+        # 更新 seed 
+        # 首先判断 seed 在 data seeds 中的数量是否为 1
         assert self.data_seeds.count(seed) == 1, \
             '{} entrie(s) of {} exist in Mutator data_seeds'. \
             format(self.data_seeds.count(seed), seed)
 
+        # 这里似乎采用了一种类似 LRU 的策略，将（参数） seed 移动到最后
         idx = self.data_seeds.index(seed)
         self.data_seeds.pop(idx)
         self.data_seeds.append(seed)
@@ -359,7 +362,7 @@ class rvMutator():
         prefix = []
         words = []
         suffix = []
-
+        # 指令重置 
         self.inst_generator.reset()
 
         data_seed = -1

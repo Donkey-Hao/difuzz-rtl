@@ -24,6 +24,7 @@
 #define clear_mie ;
 #endif
 
+// 这里在初始化寄存器：首先给 x31 random data0，然后加载内存中 x31 的地址偏移的值
 #define INIT_XREGS              \
 init_xreg:                      \
         la x31, _random_data0;  \
@@ -59,6 +60,7 @@ init_xreg:                      \
         ld x30,232(x31);        \
         ld x31,240(x31);        
 
+// 初始化浮点寄存器
 #define INIT_FREGS          \
 init_fregs:                 \
         la x31, _random_data1;  \

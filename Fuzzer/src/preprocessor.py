@@ -64,7 +64,7 @@ class rvPreProcessor():
 
     def process(self, sim_input: simInput, data: list, intr: bool, num_data_sections=6):
         section_size = len(data) // num_data_sections
-
+        # 通过这个 assert 推断 data 是处理的对象？
         assert data, 'Empty data can not be processed'
         assert (section_size & (section_size - 1)) == 0, \
             'Number of memory blocks should be power of 2'

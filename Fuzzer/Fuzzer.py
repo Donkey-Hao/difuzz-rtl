@@ -49,6 +49,7 @@ def Run(dut, toplevel,
         if random.random() < prob_intr:
             assert_intr = True
 
+        # 这个 in_file 好像没有被赋值过，似乎都是 None
         if in_file: (sim_input, data, assert_intr) = mutator.read_siminput(in_file)
         else: (sim_input, data) = mutator.get(assert_intr)
 
